@@ -1,30 +1,76 @@
 ﻿Console.WriteLine("Welcome to my console calculator application");
 
 bool keepGoing = true;
-double firstNumber;
-double secondNumber;
-double result = default;
 
 while (keepGoing)
 {
-    Console.WriteLine("Enter your first number:");
+    double firstNumber = GetValidNumber("Enter your first number:");
+    double secondNumber = GetValidNumber("Enter your second number");
+    string operation = GetOperation("Choose an operation:");
+    Calculate(firstNumber, secondNumber, operation);
+    keepGoing = AskToContinue();
+}
 
-    while (!double.TryParse(Console.ReadLine(), out firstNumber))
+double GetValidNumber(string prompt)
+{
+    double num;
+    string input;
+
+    while (true)
     {
+        Console.WriteLine(prompt);          
+        input = Console.ReadLine() ?? string.Empty;  
+
+        if (double.TryParse(input, out num))
+        {
+            break;
+        }
+
         Console.WriteLine("That's not a valid number. Please enter a number (e.g., 4 or 3.14):");
     }
 
-    Console.WriteLine($"You entered: {firstNumber}");
+    Console.WriteLine($"You entered: {num}");
+    return num;
+}
 
-    Console.WriteLine("Enter your second number");
-
-    while (!double.TryParse(Console.ReadLine(), out secondNumber))
+double Calculate(double firstNumber, double secondNumber, string operation)
+{
+    double result = default;
+    switch (operation)
     {
-        Console.WriteLine("That's not a valid number. Please enter a number (e.g., 4 or 3.14):");
+        case "+":
+            result = firstNumber + secondNumber;
+            break;
+        case "-":
+            result = firstNumber - secondNumber;
+            break;
+        case "*":
+            result = firstNumber * secondNumber;
+            break;
+        case "/":
+            if (secondNumber == 0)
+            {
+                Console.WriteLine("Error: Cannot divide by zero.");
+                while (!double.TryParse(Console.ReadLine(), out secondNumber))
+                {
+                    Console.WriteLine("That's not a valid number. Try again:");
+                }
+            }
+            else
+            {
+                result = firstNumber / secondNumber;
+            }
+            break;
+        default:
+            Console.WriteLine("Invalid key. Please press A = +, S = -, M = *, or D = /.");
+            break;
     }
+    Console.WriteLine($"Result {result}");
+    return result;
+}
 
-    Console.WriteLine($"You entered: {secondNumber}");
-
+string GetOperation(string prompt)
+{
     Console.WriteLine("Choose an operation:");
     Console.WriteLine("A = Add");
     Console.WriteLine("S = Subtract");
@@ -55,57 +101,29 @@ while (keepGoing)
                 break;
             default:
                 Console.WriteLine("Invalid key. Please press A, S, M, or D.");
-                continue; 
+                continue;
         }
-        break; 
+        break;
     }
 
     Console.WriteLine($"You selected operation: {operation}");
+    return operation;
+}
 
-    switch (operation)
+bool AskToContinue()
+{
+    Console.WriteLine("Would you like to perform another calculation? (Y/N)");
+
+    while (true)
     {
-        case "+":
-            result = firstNumber + secondNumber;
-            break;
-        case "-":
-            result = firstNumber - secondNumber;
-            break;
-        case "*":
-            result = firstNumber * secondNumber;
-            break;
-        case "/":
-            if (secondNumber == 0)
-            {
-                Console.WriteLine("Error: Cannot divide by zero.");
-                while (!double.TryParse(Console.ReadLine(), out secondNumber))
-                {
-                    Console.WriteLine("That's not a valid number. Try again:");
-                }
-            }
-            else
-            {
-                result = firstNumber / secondNumber;
-            }
-            break;
-        default:
-            Console.WriteLine("Invalid key. Please press A = +, S = -, M = *, or D = /.");
-            break;
-    }
+        var key = Console.ReadKey(true);
+        char input = char.ToUpper(key.KeyChar);
 
-
-
-    Console.WriteLine($"Result {result}");
-
-    Console.WriteLine("Would you like to keep going? Press Y or N on your keyboard");
-
-    var key = Console.ReadKey();
-
-    if(char.ToUpper(key.KeyChar) == 'Y')
-    {
-        keepGoing = true;
-    }
-    else if (char.ToUpper(key.KeyChar) == 'N')
-    {
-        keepGoing = false;
+        if (input == 'Y')
+            return true;
+        else if (input == 'N')
+            return false;
+        else
+            Console.WriteLine("Please press 'Y' to continue or 'N' to exit.");
     }
 }
